@@ -1,0 +1,320 @@
+Program.Sub.ScreenSU.Start
+Gui.FormSettings..Create
+Gui.FormSettings..Caption("SRMS Integration Settings [5917]")
+Gui.FormSettings..Size(7260,2220)
+Gui.FormSettings..MinX(0)
+Gui.FormSettings..MinY(0)
+Gui.FormSettings..Position(0,0)
+Gui.FormSettings..BackColor(-2147483633)
+Gui.FormSettings..MousePointer(0)
+Gui.FormSettings..Event(UnLoad,FormSettings_UnLoad)
+Gui.FormSettings.txtUpdateDueDatePath.Create(TextBox,"",True,6495,300,0,105,405,True,0,"Arial",8,-2147483643,1)
+Gui.FormSettings.txtWOClosePath.Create(TextBox,"",True,6495,300,0,105,1080,True,0,"Arial",8,-2147483643,1)
+Gui.FormSettings.lblClosePath.Create(Label,"WO Close Path:",True,1935,255,0,105,885,True,0,"Arial",8,-2147483633,0)
+Gui.FormSettings.lblDueDateUpdatePath.Create(Label,"WO Due Date Update Path:",True,2325,255,0,105,210,True,0,"Arial",8,-2147483633,0)
+Gui.FormSettings.cmdDueDatePathBrowser.Create(Button)
+Gui.FormSettings.cmdDueDatePathBrowser.Size(375,375)
+Gui.FormSettings.cmdDueDatePathBrowser.Position(6645,360)
+Gui.FormSettings.cmdDueDatePathBrowser.Caption("^")
+Gui.FormSettings.cmdDueDatePathBrowser.Event(Click,cmdDueDatePathBrowser_Click)
+Gui.FormSettings.cmdClosePathBrowser.Create(Button)
+Gui.FormSettings.cmdClosePathBrowser.Size(375,375)
+Gui.FormSettings.cmdClosePathBrowser.Position(6645,1050)
+Gui.FormSettings.cmdClosePathBrowser.Caption("^")
+Gui.FormSettings.cmdClosePathBrowser.Event(Click,cmdClosePathBrowser_Click)
+Gui.FormSettings.cmdSave.Create(Button)
+Gui.FormSettings.cmdSave.Size(855,375)
+Gui.FormSettings.cmdSave.Position(6165,1470)
+Gui.FormSettings.cmdSave.Caption("Save")
+Gui.FormSettings.cmdSave.Event(Click,cmdSave_Click)
+Program.Sub.ScreenSU.End
+
+Program.Sub.Preflight.Start
+Program.Sub.Preflight.End
+
+Program.Sub.Main.Start
+'GCG_5917_Settings.g2u
+'Trey S
+'March 17th, 2020
+'for Voelstapine
+'Ticket VOE010-122020191315-8
+'Quote 12011
+'This script is for maintaining paths that will be used for maintaining paths that are used for processing files in another script in the project.
+
+F.Intrinsic.Control.Try
+
+F.Intrinsic.Control.CallSub(SetIcon)
+F.Intrinsic.Control.CallSub(LoadPaths)
+GUI.FormSettings..Show
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FormSettings_UnLoad")
+F.Intrinsic.Control.EndTry
+Program.Sub.Main.End
+
+Program.Sub.cmdSave_Click.Start
+F.Intrinsic.Control.Try
+
+GUI.FormSettings..Enabled(False)
+F.Intrinsic.Control.CallSub(SavePaths)
+GUI.FormSettings..Enabled(True)
+GUI.FormSettings..SetFocus
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FormSettings_UnLoad")
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdSave_Click.End
+
+Program.Sub.cmdClosePathBrowser_Click.Start
+F.Intrinsic.Control.Try
+
+V.Local.sRet.Declare(String)
+
+F.Intrinsic.UI.FolderBrowser("Select Work Order Close Path", 0, V.Local.sRet)
+F.Intrinsic.Control.If(V.Local.sRet.IsNotCancel)
+	GUI.FormSettings.txtWOClosePath.Text(V.Local.sRet)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FormSettings_UnLoad")
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdClosePathBrowser_Click.End
+
+Program.Sub.cmdDueDatePathBrowser_Click.Start
+F.Intrinsic.Control.Try
+
+V.Local.sRet.Declare(String)
+
+F.Intrinsic.UI.FolderBrowser("Select Work Order Due Date Update Path", 0, V.Local.sRet)
+F.Intrinsic.Control.If(V.Local.sRet.IsNotCancel)
+	GUI.FormSettings.txtUpdateDueDatePath.Text(V.Local.sRet)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FormSettings_UnLoad")
+F.Intrinsic.Control.EndTry
+Program.Sub.cmdDueDatePathBrowser_Click.End
+
+Program.Sub.LoadPaths.Start
+F.Intrinsic.Control.Try
+
+V.Local.sPath.Declare(String)
+V.Local.sContents.Declare(String)
+V.Local.bExists.Declare(Boolean)
+
+F.Intrinsic.String.Build("{0}\Custom\5917\{1}\Settings\Work_Order_Due_Date_Update_Path.dat", V.Caller.GlobalDir, V.Caller.CompanyCode, V.Local.sPath)
+F.Intrinsic.File.Exists(V.Local.sPath, V.Local.bExists)
+F.Intrinsic.Control.If(V.Local.bExists)
+	F.Intrinsic.File.File2String(V.Local.sPath, V.Local.sContents)
+	GUI.FormSettings.txtUpdateDueDatePath.Text(V.Local.sContents)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.String.Build("{0}\Custom\5917\{1}\Settings\Work_Order_Close_Path.dat", V.Caller.GlobalDir, V.Caller.CompanyCode, V.Local.sPath)
+F.Intrinsic.File.Exists(V.Local.sPath, V.Local.bExists)
+F.Intrinsic.Control.If(V.Local.bExists)
+	F.Intrinsic.File.File2String(V.Local.sPath, V.Local.sContents)
+	GUI.FormSettings.txtWOClosePath.Text(V.Local.sContents)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FormSettings_UnLoad")
+F.Intrinsic.Control.EndTry
+Program.Sub.LoadPaths.End
+
+Program.Sub.SavePaths.Start
+F.Intrinsic.Control.Try
+
+V.Local.sPath.Declare(String)
+V.Local.iRet.Declare(String)
+V.Local.bExists.Declare(String)
+V.Local.sContents.Declare(String)
+V.Local.sMessage.Declare(String)
+
+'make sure our custom directory exists
+F.Intrinsic.String.Build("{0}\Custom\5917\{1}\Settings\", V.Caller.GlobalDir, V.Caller.CompanyCode, V.Local.sPath)
+F.Intrinsic.Control.CallSub(CheckDirectories, "Directories", V.Local.sPath)
+
+'save due date update path
+F.Intrinsic.Control.If(V.Screen.FormSettings!txtUpdateDueDatePath.Text.Trim, !=, "")
+	
+	'check if the directory they entered actually exists, offer to create it
+	F.Intrinsic.File.DirExists(V.Screen.FormSettings!txtUpdateDueDatePath.Text.Trim, V.Local.bExists)
+	F.Intrinsic.Control.If(V.Local.bExists.Not)
+		F.Intrinsic.String.Build("The path {0}{1}{0} does not exist. Create it now?", V.Ambient.DblQuote, V.Screen.FormSettings!txtUpdateDueDatePath.Text.Trim, V.Local.sMessage)
+		F.Intrinsic.UI.Msgbox(V.Local.sMessage, "Create directory?", 4, V.Local.iRet)
+		
+		'if they say yes, create it
+		F.Intrinsic.Control.If(V.Local.iRet, =, V.Ambient.MsgBoxYes)
+			F.Intrinsic.File.CreateDir(V.Screen.FormSettings!txtUpdateDueDatePath.Text.Trim)
+			
+			'check if it was created sucessfully
+			F.Intrinsic.File.DirExists(V.Screen.FormSettings!txtUpdateDueDatePath.Text.Trim, V.Local.bExists)
+			F.Intrinsic.Control.If(V.Local.bExists.Not)
+				F.Intrinsic.UI.Msgbox("Error: Failed to create directory.")
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+	
+	'save the directory
+	F.Intrinsic.String.Build("{0}\Custom\5917\{1}\Settings\Work_Order_Due_Date_Update_Path.dat", V.Caller.GlobalDir, V.Caller.CompanyCode, V.Local.sPath)
+	F.Intrinsic.File.String2File(V.Local.sPath, V.Screen.FormSettings!txtUpdateDueDatePath.Text.Trim)
+F.Intrinsic.Control.Else
+	
+	'since they entered an empty value, delete the file
+	F.Intrinsic.String.Build("{0}\Custom\5917\{1}\Settings\Work_Order_Due_Date_Update_Path.dat", V.Caller.GlobalDir, V.Caller.CompanyCode, V.Local.sPath)
+	F.Intrinsic.File.Exists(V.Local.sPath, V.Local.bExists)
+	F.Intrinsic.Control.If(V.Local.bExists)
+		F.Intrinsic.File.DeleteFile(V.Local.sPath)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+
+'save work order close path
+F.Intrinsic.Control.If(V.Screen.FormSettings!txtWOClosePath.Text.Trim, !=, "")
+	
+	'check if the directory they entered actually exists, offer to create it
+	F.Intrinsic.File.DirExists(V.Screen.FormSettings!txtWOClosePath.Text.Trim, V.Local.bExists)
+	F.Intrinsic.Control.If(V.Local.bExists.Not)
+		F.Intrinsic.String.Build("The directory {0}{1}{0} does not exist. Create it now?", V.Ambient.DblQuote, V.Screen.FormSettings!txtWOClosePath.Text.Trim, V.Local.sMessage)
+		F.Intrinsic.UI.Msgbox(V.Local.sMessage, "Create directory?", 4, V.Local.iRet)
+		
+		'if they say yes, create it
+		F.Intrinsic.Control.If(V.Local.iRet, =, V.Ambient.MsgBoxYes)
+			F.Intrinsic.File.CreateDir(V.Screen.FormSettings!txtWOClosePath.Text.Trim)
+			
+			'check if it was created sucessfully
+			F.Intrinsic.File.DirExists(V.Screen.FormSettings!txtWOClosePath.Text.Trim, V.Local.bExists)
+			F.Intrinsic.Control.If(V.Local.bExists.Not)
+				F.Intrinsic.UI.Msgbox("Error: Failed to create directory.")
+			F.Intrinsic.Control.EndIf
+		F.Intrinsic.Control.EndIf
+	F.Intrinsic.Control.EndIf
+	
+	'save the directory
+	F.Intrinsic.String.Build("{0}\Custom\5917\{1}\Settings\Work_Order_Close_Path.dat", V.Caller.GlobalDir, V.Caller.CompanyCode, V.Local.sPath)
+	F.Intrinsic.File.String2File(V.Local.sPath, V.Screen.FormSettings!txtWOClosePath.Text.Trim)
+F.Intrinsic.Control.Else
+	
+	'since they entered an empty value, delete the file
+	F.Intrinsic.String.Build("{0}\Custom\5917\{1}\Settings\Work_Order_Close_Path.dat", V.Caller.GlobalDir, V.Caller.CompanyCode, V.Local.sPath)
+	F.Intrinsic.File.Exists(V.Local.sPath, V.Local.bExists)
+	F.Intrinsic.Control.If(V.Local.bExists)
+		F.Intrinsic.File.DeleteFile(V.Local.sPath)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FormSettings_UnLoad")
+F.Intrinsic.Control.EndTry
+Program.Sub.SavePaths.End
+
+Program.Sub.CheckDirectories.Start
+'check if the given import directories exist
+'create them if they don't
+'pass directories delimited with *!*
+
+F.Intrinsic.Control.Try
+
+V.Local.sDirectories.Declare(String)
+V.Local.sPath.Declare(String)
+V.Local.bExists.Declare(Boolean)
+V.Local.iCounter.Declare(Long)
+
+V.Local.sDirectories.Set(V.Args.Directories)
+F.Intrinsic.String.Split(V.Local.sDirectories, "*!*", V.Local.sDirectories)
+
+F.Intrinsic.Control.For(V.Local.iCounter, 0, V.Local.sDirectories.UBound, 1)
+	V.Local.sPath.Set(V.Local.sDirectories(V.Local.iCounter))
+	F.Intrinsic.File.DirExists(V.Local.sPath, V.Local.bExists)
+	F.Intrinsic.Control.If(V.Local.bExists.Not)
+		F.Intrinsic.File.CreateDir(V.Local.sPath)
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.Next(V.Local.iCounter)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FormSettings_UnLoad")
+F.Intrinsic.Control.EndTry
+Program.Sub.CheckDirectories.End
+
+Program.Sub.FormSettings_UnLoad.Start
+F.Intrinsic.Control.Try
+
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FormSettings_UnLoad")
+F.Intrinsic.Control.EndTry
+Program.Sub.FormSettings_UnLoad.End
+
+Program.Sub.ErrorMessage.Start
+'basic error message for replacing catch block
+'this is really just for when printing the message and ending program
+'pass error number, error description, current subroutine
+'optional callback sub, this will be called before ending
+
+F.Intrinsic.Control.Try
+
+V.Local.iError.Declare(Long)
+V.Local.sErrorDescription.Declare(String)
+V.Local.sSubroutine.Declare(String)
+V.Local.sError.Declare(String)
+V.Local.bExists.Declare(Boolean)
+V.Local.sCallback.Declare(String)
+V.Static.bError.Declare(Boolean, False)
+
+V.Local.iError.Set(V.Args.ErrorNumber)
+V.Local.sErrorDescription.Set(V.Args.ErrorDescription)
+V.Local.sSubroutine.Set(V.Args.Subroutine)
+
+'make sure we aren't in an error loop
+F.Intrinsic.Control.If(V.Static.bError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndIf
+V.Static.bError.Set(True)
+
+F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}", V.Caller.ScriptFile, V.Ambient.Newline, V.Local.sSubroutine, V.Local.iError, V.Local.sErrorDescription, V.Ambient.GABVersion, V.Local.sError)
+F.Intrinsic.UI.Msgbox(V.Local.sError)
+
+F.Intrinsic.Variable.ArgExists("Callback", V.Local.bExists)
+F.Intrinsic.Control.If(V.Local.bExists)
+	V.Local.sCallback.Set(V.Args.Callback.Trim)
+	F.Intrinsic.Control.CallSub(V.Local.sCallback)
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.Control.End
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.String.Build("Project: {0}{1}{1}Subroutine: {2}{1}Error Occurred {3} with description {4}{1}{1}GAB Version: {5}",V.Caller.ScriptFile,V.Ambient.Newline,V.Ambient.CurrentSubroutine,V.Ambient.ErrorNumber,V.Ambient.ErrorDescription,V.Ambient.GABVersion,V.Local.sError)
+	F.Intrinsic.UI.Msgbox(V.Local.sError)
+	F.Intrinsic.Control.End
+F.Intrinsic.Control.EndTry
+Program.Sub.ErrorMessage.End
+
+Program.Sub.SetIcon.Start
+F.Intrinsic.Control.Try
+
+V.Local.sForm.Declare(String)
+V.Local.bExists.Declare(Boolean)
+V.Local.sIcon.Declare(String)
+V.Local.iCounter.Declare(Long)
+
+F.Intrinsic.String.Build("{0}\ART\gss2.ico",V.Caller.GlobalDir,v.Local.sIcon)
+F.Intrinsic.File.Exists(V.Local.sIcon, V.Local.bExists)
+F.Intrinsic.Control.If(V.Local.bExists.Not)
+	F.Intrinsic.String.Build("{0}\GAB\GAS\gss2.ico",V.Caller.PluginsDir,v.Local.sIcon)
+	F.Intrinsic.File.Exists(V.Local.sIcon, V.Local.bExists)
+	F.Intrinsic.Control.If(V.Local.bExists.Not)
+		F.Intrinsic.Control.ExitSub
+	F.Intrinsic.Control.EndIf
+F.Intrinsic.Control.EndIf
+
+F.Intrinsic.UI.GetFormList(V.Local.sForm)
+F.Intrinsic.String.Split(V.Local.sForm, "*!*", V.Local.sForm)
+
+F.Intrinsic.Control.For(V.Local.iCounter, 0, V.Local.sForm.UBound, 1)
+	Gui.[V.Local.sForm(V.Local.iCounter)]..Icon(V.Local.sIcon)
+F.Intrinsic.Control.Next(V.Local.iCounter)
+
+F.Intrinsic.Control.Catch
+	F.Intrinsic.Control.CallSub(ErrorMessage, "ErrorNumber", V.Ambient.ErrorNumber, "ErrorDescription", V.Ambient.ErrorDescription, "Subroutine", V.Ambient.CurrentSubroutine, "Callback", "FormSettings_UnLoad")
+F.Intrinsic.Control.EndTry
+Program.Sub.SetIcon.End
